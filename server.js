@@ -12,9 +12,20 @@ const path = require("path");
 const express = require("express");
 const { Telegraf } = require("telegraf");
 
-const { PACKS } = require("./lib/packs");
+const fs = require("fs");
+const { PACKS, getPack, getTgsAssetPath } = require("./lib/packs");
 const { generatePackImages, normalizeHex } = require("./lib/recolor");
+const {
+  normalizeHex: normalizeHexLottie,
+  tgsBufferToRecoloredJson,
+  tgsBufferToRecoloredTgsBuffer,
+} = require("./lib/lottieRecolor");
 const { verifyInitData } = require("./lib/verifyInitData");
+const {
+  buildStickerSetName,
+  createCustomEmojiStickerSet,
+  addEmojiPackLink,
+} = require("./lib/telegramStickers");
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const PUBLIC_URL = process.env.PUBLIC_URL;
@@ -29,6 +40,8 @@ if (!BOT_TOKEN) {
 const bot = new Telegraf(BOT_TOKEN);
 const app = express();
 app.use(express.json());
+
+let BOT_USERNAME = null;
 
 // ---------------------------------------------------------------------------
 // Bot commands
@@ -67,10 +80,40 @@ app.get("/api/packs", (req, res) => {
       name: p.name,
       description: p.description,
       priceCents: p.priceCents,
+      kind: p.kind || "svg",
       shapeCount: p.shapes.length,
       shapes: p.shapes,
     })),
   });
+});
+
+// ---------------------------------------------------------------------------
+// API: live-preview a single .tgs shape recolored to the given primary/
+// secondary hex pair, as plain (uncompressed) Lottie JSON — the Mini App
+// feeds this straight into lottie-web to animate it live while the user
+// is picking colors on the Customize screen.
+// ---------------------------------------------------------------------------
+
+app.get("/api/lottie", (req, res) => {
+  try {
+    const { packId, shapeId, primary, secondary } = req.query;
+
+    const pack = getPack(packId);
+    if (!pack || pack.kind !== "tgs" || !pack.shapes.includes(shapeId)) {
+      return res.status(404).json({ error: "unknown_shape" });
+    }
+
+    const primaryHex = normalizeHexLottie(primary);
+    if (!primaryHex) return res.status(400).json({ error: "invalid_hex" });
+    const secondaryHex = secondary ? normalizeHexLottie(secondary) : "#000000";
+
+    const buffer = fs.readFileSync(getTgsAssetPath(shapeId));
+    const json = tgsBufferToRecoloredJson(buffer, primaryHex, secondaryHex);
+    res.json(json);
+  } catch (err) {
+    console.error("lottie preview error:", err);
+    res.status(500).json({ error: "preview_failed", message: err.message });
+  }
 });
 
 // ---------------------------------------------------------------------------
@@ -108,8 +151,59 @@ app.post("/api/generate", async (req, res) => {
       return res.status(400).json({ error: "missing_user" });
     }
 
-    const { pack, images } = await generatePackImages(packId, primary, secondary);
+    const pack = getPack(packId);
+    if (!pack) {
+      return res.status(404).json({ error: "unknown_pack" });
+    }
+
+    let images;
+    if (pack.kind === "tgs") {
+      images = pack.shapes.map((shapeId) => {
+        const buffer = fs.readFileSync(getTgsAssetPath(shapeId));
+        const tgsBuffer = tgsBufferToRecoloredTgsBuffer(buffer, primary, secondary || "#000000");
+        return {
+          shapeId,
+          filename: `${pack.id}-${shapeId}-${primary.replace("#", "")}.tgs`,
+          buffer: tgsBuffer,
+        };
+      });
+    } else {
+      ({ images } = await generatePackImages(packId, primary, secondary));
+    }
+
     const displayName = (packName && String(packName).trim()) || pack.name;
+
+    // For real animated packs, create an actual Telegram custom emoji
+    // sticker set (the kind that shows up in the emoji panel / "Share
+    // Emoji" screen), rather than just DMing loose files. Falls back to
+    // plain file delivery if set creation fails for any reason.
+    if (pack.kind === "tgs" && BOT_USERNAME) {
+      try {
+        const setName = buildStickerSetName({ packId: pack.id, userId, botUsername: BOT_USERNAME });
+        await createCustomEmojiStickerSet({
+          botToken: BOT_TOKEN,
+          userId,
+          name: setName,
+          title: displayName,
+          stickers: images,
+        });
+
+        const link = addEmojiPackLink(setName);
+        await bot.telegram.sendMessage(
+          userId,
+          `Your "${displayName}" pack in ${primary} is ready. Tap the link below, then "Add Emoji" to add it to your emoji panel:\n${link}\n\n(Sending custom emoji in chats requires Telegram Premium — everyone can still view and add the pack.)`
+        );
+
+        return res.json({ ok: true, delivered: images.length, stickerSetLink: link });
+      } catch (err) {
+        console.error("createCustomEmojiStickerSet failed, falling back to file delivery:", err.message);
+        await bot.telegram.sendMessage(
+          userId,
+          `Couldn't create a live emoji pack just now, so sending the files directly instead — you can still add them manually.`
+        );
+        // falls through to the file-delivery path below
+      }
+    }
 
     // Telegram allows up to 10 items per sendMediaGroup call, so chunk it.
     const chunkSize = 10;
@@ -140,6 +234,10 @@ app.post("/api/generate", async (req, res) => {
 // ---------------------------------------------------------------------------
 
 async function main() {
+  const me = await bot.telegram.getMe();
+  BOT_USERNAME = me.username;
+  console.log(`Bot username: @${BOT_USERNAME}`);
+
   if (USE_WEBHOOK) {
     if (!PUBLIC_URL) {
       console.error("USE_WEBHOOK=true requires PUBLIC_URL to be set in .env");

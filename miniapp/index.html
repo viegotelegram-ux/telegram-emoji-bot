@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Emoji Store</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
@@ -591,6 +592,55 @@
     return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
   }
 
+  // ---------------- Real .tgs playback (Lottie) ----------------
+  // For "tgs"-kind packs, each cell fetches its recolored Lottie JSON from
+  // our own server (which already decompressed + recolored the real .tgs
+  // file) and plays it live via lottie-web. SVG-kind packs (the built-in
+  // placeholder shapes) keep rendering instantly and locally as before.
+
+  function destroyLotties(container) {
+    if (container._lotties) {
+      container._lotties.forEach((anim) => { try { anim.destroy(); } catch (e) {} });
+    }
+    container._lotties = [];
+  }
+
+  async function renderShapeCells(container, shapeIds, pack, primaryHex, secondaryHex) {
+    destroyLotties(container);
+
+    if (!pack || pack.kind !== "tgs") {
+      container.innerHTML = shapeIds.map(s => `<div class="cell">${shapeSvg(s, primaryHex, secondaryHex)}</div>`).join("");
+      return;
+    }
+
+    container.innerHTML = shapeIds.map(s => `<div class="cell" data-shape="${s}"></div>`).join("");
+    const cells = [...container.querySelectorAll(".cell")];
+    const lotties = [];
+
+    await Promise.all(cells.map(async (cell) => {
+      const shapeId = cell.dataset.shape;
+      try {
+        const url = `/api/lottie?packId=${encodeURIComponent(pack.id)}&shapeId=${encodeURIComponent(shapeId)}&primary=${encodeURIComponent(primaryHex.replace("#", ""))}&secondary=${encodeURIComponent(secondaryHex.replace("#", ""))}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("lottie fetch failed");
+        const animationData = await res.json();
+        const anim = window.lottie.loadAnimation({
+          container: cell,
+          renderer: "svg",
+          loop: true,
+          autoplay: true,
+          animationData,
+        });
+        lotties.push(anim);
+      } catch (err) {
+        console.error("Failed to load animated emoji", shapeId, err);
+        cell.innerHTML = "";
+      }
+    }));
+
+    container._lotties = lotties;
+  }
+
   const HEX_RE = /^[0-9a-fA-F]{6}$/;
   const PALETTE = ["22C55E","FFFFFF","000000","F87171","FB923C","F59E0B","FACC15","A3E635","10B981","14B8A6","38BDF8","3B82F6","6366F1","A855F7","D8B4FE","F472B6","FB7185","EF4444","B45309","9CA3AF"];
   const CYCLE_MS = 5000;
@@ -654,7 +704,7 @@
     const chunks = chunk(pack.shapes, 8);
     const idx = chunkIndex % chunks.length;
     const cells = chunks[idx];
-    grid.innerHTML = cells.map(s => `<div class="cell">${shapeSvg(s, "#" + state.primary, "#" + state.secondary)}</div>`).join("");
+    return renderShapeCells(grid, cells, pack, "#" + state.primary, "#" + state.secondary);
   }
 
   function startCycling(cardEl, pack) {
@@ -663,9 +713,9 @@
     const interval = setInterval(() => {
       const grid = cardEl.querySelector(".preview-grid");
       grid.classList.add("fading");
-      setTimeout(() => {
+      setTimeout(async () => {
         idx += 1;
-        renderCardPreview(cardEl, pack, idx);
+        await renderCardPreview(cardEl, pack, idx);
         grid.classList.remove("fading");
       }, 350);
     }, CYCLE_MS);
@@ -748,7 +798,7 @@
     const pack = state.activePack;
     if (!pack) return;
     const shown = pack.shapes.slice(0, 10);
-    els.czPreviewGrid.innerHTML = shown.map(s => `<div class="cell">${shapeSvg(s, "#" + state.primary, "#" + state.secondary)}</div>`).join("");
+    renderShapeCells(els.czPreviewGrid, shown, pack, "#" + state.primary, "#" + state.secondary);
     els.czPreviewName.textContent = els.packNameInput.value || pack.name;
   }
 
@@ -756,7 +806,7 @@
     const pack = state.activePack;
     if (!pack) return;
     els.includesLabel.textContent = `Includes ${pack.shapes.length}`;
-    els.includesGrid.innerHTML = pack.shapes.map(s => `<div class="cell">${shapeSvg(s, "#" + state.primary, "#" + state.secondary)}</div>`).join("");
+    renderShapeCells(els.includesGrid, pack.shapes, pack, "#" + state.primary, "#" + state.secondary);
   }
 
   function renderColorFields() {
