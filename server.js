@@ -24,6 +24,7 @@ const { verifyInitData } = require("./lib/verifyInitData");
 const {
   buildStickerSetName,
   createCustomEmojiStickerSet,
+  addStickerOne,
   addEmojiPackLink,
 } = require("./lib/telegramStickers");
 
@@ -180,21 +181,45 @@ app.post("/api/generate", async (req, res) => {
     if (pack.kind === "tgs" && BOT_USERNAME) {
       try {
         const setName = buildStickerSetName({ packId: pack.id, userId, botUsername: BOT_USERNAME });
+        const firstBatch = images.slice(0, 50);
+        const rest = images.slice(50);
+
         await createCustomEmojiStickerSet({
           botToken: BOT_TOKEN,
           userId,
           name: setName,
           title: displayName,
-          stickers: images,
+          stickers: firstBatch,
         });
+
+        // Telegram only accepts the first 50 in the initial create call —
+        // add anything past that one at a time.
+        let addedCount = firstBatch.length;
+        for (let i = 0; i < rest.length; i++) {
+          const img = rest[i];
+          try {
+            await addStickerOne({
+              botToken: BOT_TOKEN,
+              userId,
+              name: setName,
+              buffer: img.buffer,
+              filename: img.filename,
+              emojiIndex: 50 + i,
+            });
+            addedCount++;
+          } catch (addErr) {
+            console.error(`addStickerToSet failed for ${img.filename}:`, addErr.message);
+            // keep going — a handful of failed adds shouldn't sink the whole pack
+          }
+        }
 
         const link = addEmojiPackLink(setName);
         await bot.telegram.sendMessage(
           userId,
-          `Your "${displayName}" pack in ${primary} is ready. Tap the link below, then "Add Emoji" to add it to your emoji panel:\n${link}\n\n(Sending custom emoji in chats requires Telegram Premium — everyone can still view and add the pack.)`
+          `Your "${displayName}" pack in ${primary} is ready (${addedCount}/${images.length} emoji added). Tap the link below, then "Add Emoji" to add it to your emoji panel:\n${link}\n\n(Sending custom emoji in chats requires Telegram Premium — everyone can still view and add the pack.)`
         );
 
-        return res.json({ ok: true, delivered: images.length, stickerSetLink: link });
+        return res.json({ ok: true, delivered: addedCount, stickerSetLink: link });
       } catch (err) {
         console.error("createCustomEmojiStickerSet failed, falling back to file delivery:", err.message);
         await bot.telegram.sendMessage(
