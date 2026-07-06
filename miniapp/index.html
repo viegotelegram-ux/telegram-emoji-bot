@@ -3,22 +3,23 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Recolor Shop</title>
+<title>Emoji Store</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: var(--tg-theme-bg-color, #F1F3F1);
-    --surface: var(--tg-theme-secondary-bg-color, #FFFFFF);
-    --ink: var(--tg-theme-text-color, #14171A);
-    --muted: var(--tg-theme-hint-color, #767B82);
-    --accent: #5B4FE9;
-    --accent-ink: #FFFFFF;
-    --line: rgba(20, 23, 26, 0.08);
-    --cta: #C7F84C;
-    --cta-ink: #14171A;
-    --radius: 18px;
+    --bg: #000000;
+    --surface: #0D0D0D;
+    --surface-2: #161616;
+    --accent: #FFCC01;
+    --accent-ink: #1A1400;
+    --ink: #F5F5F0;
+    --muted: #8C8C86;
+    --muted-dim: #5C5C58;
+    --line: rgba(255, 255, 255, 0.08);
+    --line-strong: rgba(255, 255, 255, 0.14);
+    --radius: 20px;
   }
 
   * { box-sizing: border-box; }
@@ -33,59 +34,171 @@
   }
 
   body {
-    padding: 16px 16px 96px;
+    padding: 16px 16px 40px;
     max-width: 560px;
     margin: 0 auto;
   }
 
-  .eyebrow {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 4px 0 2px;
+  /* --- Top bar --- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
   }
 
-  h1 {
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+  }
+
+  .brand-icon svg { width: 19px; height: 19px; }
+
+  .brand-name {
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 700;
-    font-size: 28px;
-    line-height: 1.1;
-    margin: 0 0 4px;
-    letter-spacing: -0.01em;
+    font-size: 16px;
+    line-height: 1.2;
   }
 
-  .sub {
-    font-size: 14px;
+  .brand-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
     color: var(--muted);
-    margin: 0 0 20px;
-    max-width: 42ch;
   }
 
-  /* --- Signature element: live swatch strip --- */
-  .swatch-panel {
+  .icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
     background: var(--surface);
-    border-radius: var(--radius);
-    padding: 18px;
-    margin-bottom: 20px;
     border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--ink);
+  }
+
+  .icon-btn svg { width: 17px; height: 17px; }
+
+  /* --- Hero --- */
+  .hero {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 20px 20px;
+    margin-bottom: 14px;
+  }
+
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .hero-eyebrow .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex: 0 0 auto;
+  }
+
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 25px;
+    line-height: 1.15;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .hero h1 .accent-text { color: var(--accent); }
+
+  .hero p {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.5;
+    max-width: 40ch;
+  }
+
+  /* --- Search --- */
+  .search-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 0 14px;
+    margin-bottom: 14px;
+  }
+
+  .search-row svg { width: 16px; height: 16px; flex: 0 0 auto; color: var(--muted); }
+
+  .search-row input {
+    border: none;
+    background: none;
+    outline: none;
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 12px 0;
+    width: 100%;
+  }
+
+  .search-row input::placeholder { color: var(--muted-dim); }
+
+  /* --- Color panel --- */
+  .color-panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 18px;
+    display: none;
+  }
+
+  .color-panel.open { display: block; }
+
+  .color-panel-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 10px;
   }
 
   .swatch-strip {
     display: flex;
-    gap: 10px;
-    margin-bottom: 16px;
+    gap: 8px;
+    margin-bottom: 14px;
     overflow-x: auto;
     padding-bottom: 2px;
   }
 
-  .swatch-strip svg {
-    flex: 0 0 auto;
-    width: 44px;
-    height: 44px;
-    transition: transform 0.15s ease;
-  }
+  .swatch-strip svg { flex: 0 0 auto; width: 36px; height: 36px; }
 
   .color-row {
     display: flex;
@@ -96,8 +209,8 @@
   .color-row input[type="color"] {
     -webkit-appearance: none;
     appearance: none;
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     border: none;
     border-radius: 12px;
     padding: 0;
@@ -112,27 +225,23 @@
     flex: 1;
     display: flex;
     align-items: center;
-    background: var(--bg);
+    background: var(--surface-2);
     border: 1px solid var(--line);
     border-radius: 12px;
     padding: 0 4px 0 12px;
   }
 
-  .hex-field span {
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--muted);
-    font-size: 15px;
-  }
+  .hex-field span { font-family: 'JetBrains Mono', monospace; color: var(--muted); font-size: 14px; }
 
   .hex-field input[type="text"] {
     border: none;
     background: none;
     outline: none;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--ink);
-    padding: 12px 8px;
+    padding: 11px 8px;
     width: 100%;
     text-transform: uppercase;
     letter-spacing: 0.02em;
@@ -140,92 +249,118 @@
 
   .hex-error {
     font-size: 12px;
-    color: #D14343;
+    color: #FF6B6B;
     margin-top: 8px;
     display: none;
     font-family: 'JetBrains Mono', monospace;
   }
 
-  /* --- Pack cards --- */
+  /* --- Pack grid --- */
   .packs-label {
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 600;
-    font-size: 15px;
-    margin: 4px 0 12px;
+    font-size: 14px;
+    margin: 2px 0 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 11px;
+  }
+
+  .pack-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
   }
 
   .pack-card {
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
   }
 
-  .pack-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12px;
+  .pack-preview {
+    position: relative;
+    background: var(--surface-2);
+    border-radius: 14px;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .pack-preview svg { width: 100%; height: 100%; }
+  .pack-preview .cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+
+  .pack-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 3px 7px;
+    border-radius: 100px;
+    text-transform: uppercase;
   }
 
   .pack-name {
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 600;
-    font-size: 17px;
-    margin: 0 0 4px;
+    font-size: 14.5px;
+    margin: 0 0 3px;
   }
 
-  .pack-desc {
-    font-size: 13px;
-    color: var(--muted);
-    margin: 0;
-    line-height: 1.4;
-  }
-
-  .pack-price {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    color: var(--muted);
-    white-space: nowrap;
-    padding-top: 2px;
-  }
-
-  .pack-shapes {
+  .pack-meta {
     display: flex;
-    gap: 8px;
-    margin: 14px 0;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 10px;
   }
 
-  .pack-shapes svg { width: 28px; height: 28px; }
+  .pack-meta .price { color: var(--accent); }
 
   .generate-btn {
     width: 100%;
     border: none;
-    border-radius: 12px;
+    border-radius: 11px;
     background: var(--accent);
     color: var(--accent-ink);
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 600;
-    font-size: 14px;
-    padding: 12px;
+    font-size: 13px;
+    padding: 11px;
     cursor: pointer;
     transition: opacity 0.15s ease, transform 0.05s ease;
   }
 
-  .generate-btn:active { transform: scale(0.98); }
+  .generate-btn:active { transform: scale(0.97); }
   .generate-btn:disabled { opacity: 0.55; cursor: default; }
+  .generate-btn.success { background: #2ED573; color: #06210F; }
 
-  .generate-btn.success {
-    background: var(--cta);
-    color: var(--cta-ink);
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 30px 10px;
+    color: var(--muted);
+    font-size: 13px;
   }
 
   .footnote {
     font-size: 11px;
-    color: var(--muted);
+    color: var(--muted-dim);
     text-align: center;
-    margin-top: 24px;
+    margin-top: 22px;
     line-height: 1.5;
   }
 
@@ -236,39 +371,62 @@
     bottom: 20px;
     max-width: 528px;
     margin: 0 auto;
-    background: var(--ink);
-    color: var(--bg);
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    color: var(--ink);
     font-size: 13px;
     padding: 14px 16px;
-    border-radius: 12px;
+    border-radius: 14px;
     text-align: center;
     transform: translateY(120%);
     transition: transform 0.25s ease;
-    font-family: 'Inter', sans-serif;
   }
   .toast.show { transform: translateY(0); }
 </style>
 </head>
 <body>
 
-  <div class="eyebrow">Emoji shop</div>
-  <h1>Recolor Shop</h1>
-  <p class="sub">Pick a hex code, preview it live, then generate a pack. It'll land in your DMs with this bot.</p>
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L14.2 9 L21.5 9.3 L15.8 13.9 L17.8 21 L12 16.8 L6.2 21 L8.2 13.9 L2.5 9.3 L9.8 9 Z" fill="#1A1400"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">Emoji Store</div>
+        <div class="brand-eyebrow">MINI APP</div>
+      </div>
+    </div>
+    <button class="icon-btn" id="settingsBtn" aria-label="Color settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
 
-  <div class="swatch-panel">
+  <div class="hero">
+    <div class="hero-eyebrow"><span class="dot"></span>Free while in beta</div>
+    <h1>Recolor emoji, <span class="accent-text">make them yours.</span></h1>
+    <p>Pick a hex code, preview it live, then generate a pack. It lands in your DMs with this bot.</p>
+  </div>
+
+  <div class="search-row">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="Search packs" />
+  </div>
+
+  <div class="color-panel" id="colorPanel">
+    <div class="color-panel-label">Your color</div>
     <div class="swatch-strip" id="swatchStrip"></div>
     <div class="color-row">
-      <input type="color" id="colorPicker" value="#5B4FE9" />
+      <input type="color" id="colorPicker" value="#FFCC01" />
       <div class="hex-field">
         <span>#</span>
-        <input type="text" id="hexInput" maxlength="6" value="5B4FE9" />
+        <input type="text" id="hexInput" maxlength="6" value="FFCC01" />
       </div>
     </div>
     <div class="hex-error" id="hexError">Enter a valid 6-digit hex code.</div>
   </div>
 
   <div class="packs-label">Packs</div>
-  <div id="packList"></div>
+  <div class="pack-grid" id="packList"></div>
 
   <p class="footnote">Generate is free right now while payments are being wired up — every pack is delivered instantly for testing.</p>
 
@@ -276,10 +434,13 @@
 
 <script>
   const tg = window.Telegram?.WebApp;
-  if (tg) { tg.ready(); tg.expand(); }
+  if (tg) {
+    tg.ready();
+    tg.expand();
+    if (tg.setHeaderColor) tg.setHeaderColor("#000000");
+    if (tg.setBackgroundColor) tg.setBackgroundColor("#000000");
+  }
 
-  // Mirrors lib/packs.js shape templates so the preview can recolor instantly
-  // in the browser, without a round trip to the server.
   const SHAPES = {
     circle: c => `<circle cx="50" cy="50" r="42" fill="${c}"/>`,
     square: c => `<rect x="10" y="10" width="80" height="80" rx="8" fill="${c}"/>`,
@@ -308,10 +469,7 @@
 
   const HEX_RE = /^[0-9a-fA-F]{6}$/;
 
-  const state = {
-    hex: "5B4FE9",
-    packs: [],
-  };
+  const state = { hex: "FFCC01", packs: [], query: "" };
 
   const swatchStrip = document.getElementById("swatchStrip");
   const colorPicker = document.getElementById("colorPicker");
@@ -319,6 +477,11 @@
   const hexError = document.getElementById("hexError");
   const packList = document.getElementById("packList");
   const toast = document.getElementById("toast");
+  const searchInput = document.getElementById("searchInput");
+  const settingsBtn = document.getElementById("settingsBtn");
+  const colorPanel = document.getElementById("colorPanel");
+
+  settingsBtn.addEventListener("click", () => colorPanel.classList.toggle("open"));
 
   const SIGNATURE_SHAPES = ["circle", "heart", "star", "hexagon", "sparkle", "drop"];
 
@@ -327,19 +490,33 @@
     swatchStrip.innerHTML = SIGNATURE_SHAPES.map(s => shapeSvg(s, color)).join("");
   }
 
+  function filteredPacks() {
+    if (!state.query) return state.packs;
+    const q = state.query.toLowerCase();
+    return state.packs.filter(p => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
+  }
+
   function renderPacks() {
     const color = "#" + state.hex;
-    packList.innerHTML = state.packs.map(pack => `
+    const packs = filteredPacks();
+
+    if (packs.length === 0) {
+      packList.innerHTML = `<div class="empty-state">No packs match "${state.query}".</div>`;
+      return;
+    }
+
+    packList.innerHTML = packs.map((pack, i) => `
       <div class="pack-card" data-pack-id="${pack.id}">
-        <div class="pack-top">
-          <div>
-            <p class="pack-name">${pack.name}</p>
-            <p class="pack-desc">${pack.description}</p>
-          </div>
-          <div class="pack-price">${pack.shapeCount} emoji</div>
+        <div class="pack-preview">
+          ${i === 0 ? '<div class="pack-badge">New</div>' : ''}
+          ${pack.shapes.slice(0, 4).map(s => `<div class="cell">${shapeSvg(s, color)}</div>`).join("")}
         </div>
-        <div class="pack-shapes">${pack.shapes.map(s => shapeSvg(s, color)).join("")}</div>
-        <button class="generate-btn" data-pack-id="${pack.id}">Generate pack</button>
+        <p class="pack-name">${pack.name}</p>
+        <div class="pack-meta">
+          <span>${pack.shapeCount} emoji</span>
+          <span class="price">Free</span>
+        </div>
+        <button class="generate-btn" data-pack-id="${pack.id}">Generate</button>
       </div>
     `).join("");
 
@@ -367,6 +544,11 @@
 
   hexInput.addEventListener("input", (e) => {
     updateColor(e.target.value.replace("#", ""));
+  });
+
+  searchInput.addEventListener("input", (e) => {
+    state.query = e.target.value.trim();
+    renderPacks();
   });
 
   function showToast(message, ms = 3200) {
@@ -402,7 +584,7 @@
         throw new Error(data.error || "generation_failed");
       }
 
-      btn.textContent = "Sent to your DMs ✓";
+      btn.textContent = "Sent ✓";
       btn.classList.add("success");
       showToast(`Delivered ${data.delivered} emoji — check your chat with the bot.`);
       setTimeout(() => {
@@ -425,7 +607,7 @@
       state.packs = data.packs;
       renderPacks();
     } catch (err) {
-      packList.innerHTML = `<p class="pack-desc">Couldn't load packs. Pull to refresh.</p>`;
+      packList.innerHTML = `<div class="empty-state">Couldn't load packs. Pull to refresh.</div>`;
     }
   }
 
