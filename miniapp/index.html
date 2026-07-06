@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Recolor Shop</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: var(--tg-theme-bg-color, #F1F3F1);
+    --surface: var(--tg-theme-secondary-bg-color, #FFFFFF);
+    --ink: var(--tg-theme-text-color, #14171A);
+    --muted: var(--tg-theme-hint-color, #767B82);
+    --accent: #5B4FE9;
+    --accent-ink: #FFFFFF;
+    --line: rgba(20, 23, 26, 0.08);
+    --cta: #C7F84C;
+    --cta-ink: #14171A;
+    --radius: 18px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    padding: 16px 16px 96px;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 4px 0 2px;
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.1;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+
+  .sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0 0 20px;
+    max-width: 42ch;
+  }
+
+  /* --- Signature element: live swatch strip --- */
+  .swatch-panel {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 20px;
+    border: 1px solid var(--line);
+  }
+
+  .swatch-strip {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .swatch-strip svg {
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    transition: transform 0.15s ease;
+  }
+
+  .color-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .color-row input[type="color"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 12px;
+    padding: 0;
+    background: none;
+    cursor: pointer;
+    flex: 0 0 auto;
+  }
+  .color-row input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+  .color-row input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); border-radius: 12px; }
+
+  .hex-field {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 0 4px 0 12px;
+  }
+
+  .hex-field span {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  .hex-field input[type="text"] {
+    border: none;
+    background: none;
+    outline: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    padding: 12px 8px;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .hex-error {
+    font-size: 12px;
+    color: #D14343;
+    margin-top: 8px;
+    display: none;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* --- Pack cards --- */
+  .packs-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    margin: 4px 0 12px;
+  }
+
+  .pack-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .pack-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .pack-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 17px;
+    margin: 0 0 4px;
+  }
+
+  .pack-desc {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .pack-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    white-space: nowrap;
+    padding-top: 2px;
+  }
+
+  .pack-shapes {
+    display: flex;
+    gap: 8px;
+    margin: 14px 0;
+  }
+
+  .pack-shapes svg { width: 28px; height: 28px; }
+
+  .generate-btn {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 12px;
+    cursor: pointer;
+    transition: opacity 0.15s ease, transform 0.05s ease;
+  }
+
+  .generate-btn:active { transform: scale(0.98); }
+  .generate-btn:disabled { opacity: 0.55; cursor: default; }
+
+  .generate-btn.success {
+    background: var(--cta);
+    color: var(--cta-ink);
+  }
+
+  .footnote {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 24px;
+    line-height: 1.5;
+  }
+
+  .toast {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 20px;
+    max-width: 528px;
+    margin: 0 auto;
+    background: var(--ink);
+    color: var(--bg);
+    font-size: 13px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    text-align: center;
+    transform: translateY(120%);
+    transition: transform 0.25s ease;
+    font-family: 'Inter', sans-serif;
+  }
+  .toast.show { transform: translateY(0); }
+</style>
+</head>
+<body>
+
+  <div class="eyebrow">Emoji shop</div>
+  <h1>Recolor Shop</h1>
+  <p class="sub">Pick a hex code, preview it live, then generate a pack. It'll land in your DMs with this bot.</p>
+
+  <div class="swatch-panel">
+    <div class="swatch-strip" id="swatchStrip"></div>
+    <div class="color-row">
+      <input type="color" id="colorPicker" value="#5B4FE9" />
+      <div class="hex-field">
+        <span>#</span>
+        <input type="text" id="hexInput" maxlength="6" value="5B4FE9" />
+      </div>
+    </div>
+    <div class="hex-error" id="hexError">Enter a valid 6-digit hex code.</div>
+  </div>
+
+  <div class="packs-label">Packs</div>
+  <div id="packList"></div>
+
+  <p class="footnote">Generate is free right now while payments are being wired up — every pack is delivered instantly for testing.</p>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  const tg = window.Telegram?.WebApp;
+  if (tg) { tg.ready(); tg.expand(); }
+
+  // Mirrors lib/packs.js shape templates so the preview can recolor instantly
+  // in the browser, without a round trip to the server.
+  const SHAPES = {
+    circle: c => `<circle cx="50" cy="50" r="42" fill="${c}"/>`,
+    square: c => `<rect x="10" y="10" width="80" height="80" rx="8" fill="${c}"/>`,
+    roundedSquare: c => `<rect x="8" y="8" width="84" height="84" rx="24" fill="${c}"/>`,
+    triangle: c => `<polygon points="50,8 92,88 8,88" fill="${c}"/>`,
+    star: c => `<polygon points="50,5 61,37 96,37 68,58 79,91 50,71 21,91 32,58 4,37 39,37" fill="${c}"/>`,
+    heart: c => `<path d="M50 88 C 15 65, 5 40, 22 22 C 35 9, 50 20, 50 32 C 50 20, 65 9, 78 22 C 95 40, 85 65, 50 88 Z" fill="${c}"/>`,
+    diamond: c => `<polygon points="50,5 90,50 50,95 10,50" fill="${c}"/>`,
+    hexagon: c => `<polygon points="50,5 90,27 90,73 50,95 10,73 10,27" fill="${c}"/>`,
+    pentagon: c => `<polygon points="50,5 92,37 76,90 24,90 8,37" fill="${c}"/>`,
+    drop: c => `<path d="M50 5 C 65 30, 88 55, 88 72 A 38 38 0 1 1 12 72 C 12 55, 35 30, 50 5 Z" fill="${c}"/>`,
+    moon: c => `<path d="M62 6 A 46 46 0 1 0 62 94 A 38 38 0 1 1 62 6 Z" fill="${c}"/>`,
+    cloud: c => `<path d="M25 70 A 18 18 0 0 1 25 34 A 22 22 0 0 1 68 26 A 18 18 0 0 1 72 70 Z" fill="${c}"/>`,
+    sparkle: c => `<path d="M50 2 C 52 35, 65 48, 98 50 C 65 52, 52 65, 50 98 C 48 65, 35 52, 2 50 C 35 48, 48 35, 50 2 Z" fill="${c}"/>`,
+    ring: c => `<circle cx="50" cy="50" r="38" fill="none" stroke="${c}" stroke-width="14"/>`,
+    dotSmall: c => `<circle cx="50" cy="50" r="18" fill="${c}"/>`,
+    dotLarge: c => `<circle cx="50" cy="50" r="46" fill="${c}"/>`,
+    crescentDot: c => `<circle cx="50" cy="50" r="30" fill="${c}"/>`,
+    flag: c => `<rect x="20" y="6" width="6" height="88" fill="${c}"/><path d="M26 10 H86 L74 26 L86 42 H26 Z" fill="${c}" opacity="0.85"/>`,
+  };
+
+  function shapeSvg(shapeId, color) {
+    const inner = SHAPES[shapeId] ? SHAPES[shapeId](color) : "";
+    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+  }
+
+  const HEX_RE = /^[0-9a-fA-F]{6}$/;
+
+  const state = {
+    hex: "5B4FE9",
+    packs: [],
+  };
+
+  const swatchStrip = document.getElementById("swatchStrip");
+  const colorPicker = document.getElementById("colorPicker");
+  const hexInput = document.getElementById("hexInput");
+  const hexError = document.getElementById("hexError");
+  const packList = document.getElementById("packList");
+  const toast = document.getElementById("toast");
+
+  const SIGNATURE_SHAPES = ["circle", "heart", "star", "hexagon", "sparkle", "drop"];
+
+  function renderSwatchStrip() {
+    const color = "#" + state.hex;
+    swatchStrip.innerHTML = SIGNATURE_SHAPES.map(s => shapeSvg(s, color)).join("");
+  }
+
+  function renderPacks() {
+    const color = "#" + state.hex;
+    packList.innerHTML = state.packs.map(pack => `
+      <div class="pack-card" data-pack-id="${pack.id}">
+        <div class="pack-top">
+          <div>
+            <p class="pack-name">${pack.name}</p>
+            <p class="pack-desc">${pack.description}</p>
+          </div>
+          <div class="pack-price">${pack.shapeCount} emoji</div>
+        </div>
+        <div class="pack-shapes">${pack.shapes.map(s => shapeSvg(s, color)).join("")}</div>
+        <button class="generate-btn" data-pack-id="${pack.id}">Generate pack</button>
+      </div>
+    `).join("");
+
+    packList.querySelectorAll(".generate-btn").forEach(btn => {
+      btn.addEventListener("click", () => handleGenerate(btn.dataset.packId, btn));
+    });
+  }
+
+  function updateColor(newHex, { fromPicker } = {}) {
+    if (!HEX_RE.test(newHex)) {
+      hexError.style.display = "block";
+      return;
+    }
+    hexError.style.display = "none";
+    state.hex = newHex.toUpperCase();
+    hexInput.value = state.hex;
+    if (!fromPicker) colorPicker.value = "#" + state.hex;
+    renderSwatchStrip();
+    renderPacks();
+  }
+
+  colorPicker.addEventListener("input", (e) => {
+    updateColor(e.target.value.replace("#", ""), { fromPicker: true });
+  });
+
+  hexInput.addEventListener("input", (e) => {
+    updateColor(e.target.value.replace("#", ""));
+  });
+
+  function showToast(message, ms = 3200) {
+    toast.textContent = message;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), ms);
+  }
+
+  async function handleGenerate(packId, btn) {
+    if (!HEX_RE.test(state.hex)) {
+      showToast("Enter a valid hex code first.");
+      return;
+    }
+
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = "Generating…";
+
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          initData: tg?.initData || "",
+          packId,
+          hex: state.hex,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "generation_failed");
+      }
+
+      btn.textContent = "Sent to your DMs ✓";
+      btn.classList.add("success");
+      showToast(`Delivered ${data.delivered} emoji — check your chat with the bot.`);
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.classList.remove("success");
+        btn.disabled = false;
+      }, 2500);
+    } catch (err) {
+      console.error(err);
+      showToast("Couldn't generate that pack. Try again from inside Telegram.");
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }
+  }
+
+  async function loadPacks() {
+    try {
+      const res = await fetch("/api/packs");
+      const data = await res.json();
+      state.packs = data.packs;
+      renderPacks();
+    } catch (err) {
+      packList.innerHTML = `<p class="pack-desc">Couldn't load packs. Pull to refresh.</p>`;
+    }
+  }
+
+  renderSwatchStrip();
+  loadPacks();
+</script>
+</body>
+</html>
