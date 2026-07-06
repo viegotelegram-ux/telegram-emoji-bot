@@ -110,6 +110,7 @@ app.get("/api/lottie", (req, res) => {
 
     const buffer = fs.readFileSync(getTgsAssetPath(shapeId));
     const json = tgsBufferToRecoloredJson(buffer, primaryHex, secondaryHex);
+    res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
     res.json(json);
   } catch (err) {
     console.error("lottie preview error:", err);
