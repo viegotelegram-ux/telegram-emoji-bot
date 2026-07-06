@@ -39,7 +39,10 @@
     margin: 0 auto;
   }
 
-  /* --- Top bar --- */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* --- Top bars --- */
   .topbar {
     display: flex;
     align-items: center;
@@ -47,11 +50,7 @@
     margin-bottom: 20px;
   }
 
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+  .brand { display: flex; align-items: center; gap: 10px; }
 
   .brand-icon {
     width: 36px;
@@ -91,9 +90,18 @@
     justify-content: center;
     cursor: pointer;
     color: var(--ink);
+    flex: 0 0 auto;
   }
 
   .icon-btn svg { width: 17px; height: 17px; }
+
+  .customize-topbar-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
 
   /* --- Hero --- */
   .hero {
@@ -153,7 +161,7 @@
     border: 1px solid var(--line);
     border-radius: 14px;
     padding: 0 14px;
-    margin-bottom: 14px;
+    margin-bottom: 18px;
   }
 
   .search-row svg { width: 16px; height: 16px; flex: 0 0 auto; color: var(--muted); }
@@ -171,100 +179,15 @@
 
   .search-row input::placeholder { color: var(--muted-dim); }
 
-  /* --- Color panel --- */
-  .color-panel {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 16px 18px;
-    margin-bottom: 18px;
-    display: none;
-  }
-
-  .color-panel.open { display: block; }
-
-  .color-panel-label {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 600;
-    font-size: 13px;
-    margin-bottom: 10px;
-  }
-
-  .swatch-strip {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 14px;
-    overflow-x: auto;
-    padding-bottom: 2px;
-  }
-
-  .swatch-strip svg { flex: 0 0 auto; width: 36px; height: 36px; }
-
-  .color-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .color-row input[type="color"] {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 12px;
-    padding: 0;
-    background: none;
-    cursor: pointer;
-    flex: 0 0 auto;
-  }
-  .color-row input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-  .color-row input[type="color"]::-webkit-color-swatch { border: 1px solid var(--line); border-radius: 12px; }
-
-  .hex-field {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    background: var(--surface-2);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 0 4px 0 12px;
-  }
-
-  .hex-field span { font-family: 'JetBrains Mono', monospace; color: var(--muted); font-size: 14px; }
-
-  .hex-field input[type="text"] {
-    border: none;
-    background: none;
-    outline: none;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--ink);
-    padding: 11px 8px;
-    width: 100%;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-  }
-
-  .hex-error {
-    font-size: 12px;
-    color: #FF6B6B;
-    margin-top: 8px;
-    display: none;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  /* --- Pack grid --- */
+  /* --- Pack grid (storefront) --- */
   .packs-label {
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 600;
-    font-size: 14px;
-    margin: 2px 0 12px;
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     font-size: 11px;
+    margin: 2px 0 12px;
   }
 
   .pack-grid {
@@ -280,21 +203,28 @@
     padding: 14px;
     display: flex;
     flex-direction: column;
+    cursor: pointer;
   }
 
   .pack-preview {
     position: relative;
     background: var(--surface-2);
     border-radius: 14px;
-    padding: 12px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    padding: 10px;
     margin-bottom: 10px;
   }
 
-  .pack-preview svg { width: 100%; height: 100%; }
-  .pack-preview .cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+  .preview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    transition: opacity 0.35s ease;
+  }
+
+  .preview-grid.fading { opacity: 0; }
+
+  .preview-grid .cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+  .preview-grid .cell svg { width: 100%; height: 100%; }
 
   .pack-badge {
     position: absolute;
@@ -309,14 +239,10 @@
     padding: 3px 7px;
     border-radius: 100px;
     text-transform: uppercase;
+    z-index: 1;
   }
 
-  .pack-name {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 600;
-    font-size: 14.5px;
-    margin: 0 0 3px;
-  }
+  .pack-name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14.5px; margin: 0 0 3px; }
 
   .pack-meta {
     display: flex;
@@ -330,7 +256,7 @@
 
   .pack-meta .price { color: var(--accent); }
 
-  .generate-btn {
+  .customize-open-btn, .generate-btn {
     width: 100%;
     border: none;
     border-radius: 11px;
@@ -344,25 +270,174 @@
     transition: opacity 0.15s ease, transform 0.05s ease;
   }
 
-  .generate-btn:active { transform: scale(0.97); }
+  .customize-open-btn:active, .generate-btn:active { transform: scale(0.97); }
   .generate-btn:disabled { opacity: 0.55; cursor: default; }
   .generate-btn.success { background: #2ED573; color: #06210F; }
 
-  .empty-state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 30px 10px;
-    color: var(--muted);
-    font-size: 13px;
+  .empty-state { grid-column: 1 / -1; text-align: center; padding: 30px 10px; color: var(--muted); font-size: 13px; }
+
+  .footnote { font-size: 11px; color: var(--muted-dim); text-align: center; margin-top: 22px; line-height: 1.5; }
+
+  /* --- Customize screen --- */
+  .cz-preview-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
   }
 
-  .footnote {
-    font-size: 11px;
-    color: var(--muted-dim);
-    text-align: center;
-    margin-top: 22px;
-    line-height: 1.5;
+  .cz-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    background: var(--surface-2);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 14px;
   }
+
+  .cz-preview-grid .cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+  .cz-preview-grid .cell svg { width: 100%; height: 100%; }
+
+  .cz-preview-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+  }
+
+  .cz-preview-name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; margin: 0 0 3px; }
+  .cz-preview-desc { font-size: 12.5px; color: var(--muted); margin: 0; max-width: 32ch; line-height: 1.4; }
+  .cz-preview-price { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); white-space: nowrap; }
+
+  .cz-section {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 14px;
+  }
+
+  .cz-section-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .cz-section-label .accent-value { color: var(--accent); text-transform: none; letter-spacing: 0; }
+
+  #packNameInput {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 12px 14px;
+    outline: none;
+  }
+
+  .color-fields { display: flex; gap: 10px; margin-bottom: 14px; }
+
+  .color-field {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 10px 12px;
+    cursor: pointer;
+  }
+
+  .color-field.active { border-color: var(--accent); }
+
+  .color-field .swatch {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    flex: 0 0 auto;
+    border: 1px solid var(--line-strong);
+  }
+
+  .color-field .cf-text { display: flex; flex-direction: column; gap: 1px; overflow: hidden; }
+
+  .color-field .cf-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .color-field .cf-hex {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .swatch-palette {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+  }
+
+  .swatch-palette button {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .includes-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .includes-grid .cell {
+    background: var(--surface-2);
+    border-radius: 12px;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .includes-grid .cell svg { width: 100%; height: 100%; }
+
+  .cz-generate-btn {
+    width: 100%;
+    border: none;
+    border-radius: 14px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 15px;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+
+  .cz-generate-btn:active { transform: scale(0.98); }
+  .cz-generate-btn:disabled { opacity: 0.55; }
+  .cz-generate-btn.success { background: #2ED573; color: #06210F; }
+
+  .hex-error { font-size: 12px; color: #FF6B6B; margin-top: 8px; font-family: 'JetBrains Mono', monospace; display: none; }
 
   .toast {
     position: fixed;
@@ -386,49 +461,98 @@
 </head>
 <body>
 
-  <div class="topbar">
-    <div class="brand">
-      <div class="brand-icon">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L14.2 9 L21.5 9.3 L15.8 13.9 L17.8 21 L12 16.8 L6.2 21 L8.2 13.9 L2.5 9.3 L9.8 9 Z" fill="#1A1400"/></svg>
-      </div>
-      <div>
-        <div class="brand-name">Emoji Store</div>
-        <div class="brand-eyebrow">MINI APP</div>
-      </div>
-    </div>
-    <button class="icon-btn" id="settingsBtn" aria-label="Color settings">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    </button>
-  </div>
-
-  <div class="hero">
-    <div class="hero-eyebrow"><span class="dot"></span>Free while in beta</div>
-    <h1>Recolor emoji, <span class="accent-text">make them yours.</span></h1>
-    <p>Pick a hex code, preview it live, then generate a pack. It lands in your DMs with this bot.</p>
-  </div>
-
-  <div class="search-row">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
-    <input type="text" id="searchInput" placeholder="Search packs" />
-  </div>
-
-  <div class="color-panel" id="colorPanel">
-    <div class="color-panel-label">Your color</div>
-    <div class="swatch-strip" id="swatchStrip"></div>
-    <div class="color-row">
-      <input type="color" id="colorPicker" value="#FFCC01" />
-      <div class="hex-field">
-        <span>#</span>
-        <input type="text" id="hexInput" maxlength="6" value="FFCC01" />
+  <!-- ============ STOREFRONT ============ -->
+  <div class="screen active" id="screenStore">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2 L14.2 9 L21.5 9.3 L15.8 13.9 L17.8 21 L12 16.8 L6.2 21 L8.2 13.9 L2.5 9.3 L9.8 9 Z" fill="#1A1400"/></svg>
+        </div>
+        <div>
+          <div class="brand-name">Emoji Store</div>
+          <div class="brand-eyebrow">MINI APP</div>
+        </div>
       </div>
     </div>
-    <div class="hex-error" id="hexError">Enter a valid 6-digit hex code.</div>
+
+    <div class="hero">
+      <div class="hero-eyebrow"><span class="dot"></span>Free while in beta</div>
+      <h1>Recolor emoji, <span class="accent-text">make them yours.</span></h1>
+      <p>Pick a pack, tune the colors, generate — it lands in your DMs with this bot.</p>
+    </div>
+
+    <div class="search-row">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Search packs" />
+    </div>
+
+    <div class="packs-label">Packs</div>
+    <div class="pack-grid" id="packList"></div>
+
+    <p class="footnote">Generate is free right now while payments are being wired up — every pack is delivered instantly for testing.</p>
   </div>
 
-  <div class="packs-label">Packs</div>
-  <div class="pack-grid" id="packList"></div>
+  <!-- ============ CUSTOMIZE ============ -->
+  <div class="screen" id="screenCustomize">
+    <div class="topbar">
+      <button class="icon-btn" id="backBtn" aria-label="Back to packs">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="customize-topbar-title">Customize</span>
+      <span style="width:38px"></span>
+    </div>
 
-  <p class="footnote">Generate is free right now while payments are being wired up — every pack is delivered instantly for testing.</p>
+    <div class="cz-preview-card">
+      <div class="cz-preview-grid" id="czPreviewGrid"></div>
+      <div class="cz-preview-footer">
+        <div>
+          <p class="cz-preview-name" id="czPreviewName"></p>
+          <p class="cz-preview-desc" id="czPreviewDesc"></p>
+        </div>
+        <div class="cz-preview-price" id="czPreviewPrice">Free</div>
+      </div>
+    </div>
+
+    <div class="cz-section">
+      <div class="cz-section-label">
+        <span>Pack name</span>
+        <span id="packNameCount">0/50</span>
+      </div>
+      <input type="text" id="packNameInput" maxlength="50" />
+    </div>
+
+    <div class="cz-section">
+      <div class="cz-section-label">
+        <span>Colors</span>
+        <span class="accent-value" id="activeHexLabel">#FFCC01</span>
+      </div>
+      <div class="color-fields">
+        <div class="color-field active" id="primaryField">
+          <div class="swatch" id="primarySwatch"></div>
+          <div class="cf-text">
+            <span class="cf-label">Primary</span>
+            <span class="cf-hex" id="primaryHexText">#FFCC01</span>
+          </div>
+        </div>
+        <div class="color-field" id="secondaryField">
+          <div class="swatch" id="secondarySwatch"></div>
+          <div class="cf-text">
+            <span class="cf-label">Secondary</span>
+            <span class="cf-hex" id="secondaryHexText">#000000</span>
+          </div>
+        </div>
+      </div>
+      <div class="swatch-palette" id="swatchPalette"></div>
+      <div class="hex-error" id="hexError">Enter a valid 6-digit hex code.</div>
+    </div>
+
+    <div class="cz-section">
+      <div class="cz-section-label"><span id="includesLabel">Includes 0</span></div>
+      <div class="includes-grid" id="includesGrid"></div>
+    </div>
+
+    <button class="cz-generate-btn" id="czGenerateBtn">Generate pack</button>
+  </div>
 
   <div class="toast" id="toast"></div>
 
@@ -442,52 +566,75 @@
   }
 
   const SHAPES = {
-    circle: c => `<circle cx="50" cy="50" r="42" fill="${c}"/>`,
-    square: c => `<rect x="10" y="10" width="80" height="80" rx="8" fill="${c}"/>`,
-    roundedSquare: c => `<rect x="8" y="8" width="84" height="84" rx="24" fill="${c}"/>`,
-    triangle: c => `<polygon points="50,8 92,88 8,88" fill="${c}"/>`,
-    star: c => `<polygon points="50,5 61,37 96,37 68,58 79,91 50,71 21,91 32,58 4,37 39,37" fill="${c}"/>`,
-    heart: c => `<path d="M50 88 C 15 65, 5 40, 22 22 C 35 9, 50 20, 50 32 C 50 20, 65 9, 78 22 C 95 40, 85 65, 50 88 Z" fill="${c}"/>`,
-    diamond: c => `<polygon points="50,5 90,50 50,95 10,50" fill="${c}"/>`,
-    hexagon: c => `<polygon points="50,5 90,27 90,73 50,95 10,73 10,27" fill="${c}"/>`,
-    pentagon: c => `<polygon points="50,5 92,37 76,90 24,90 8,37" fill="${c}"/>`,
-    drop: c => `<path d="M50 5 C 65 30, 88 55, 88 72 A 38 38 0 1 1 12 72 C 12 55, 35 30, 50 5 Z" fill="${c}"/>`,
-    moon: c => `<path d="M62 6 A 46 46 0 1 0 62 94 A 38 38 0 1 1 62 6 Z" fill="${c}"/>`,
-    cloud: c => `<path d="M25 70 A 18 18 0 0 1 25 34 A 22 22 0 0 1 68 26 A 18 18 0 0 1 72 70 Z" fill="${c}"/>`,
-    sparkle: c => `<path d="M50 2 C 52 35, 65 48, 98 50 C 65 52, 52 65, 50 98 C 48 65, 35 52, 2 50 C 35 48, 48 35, 50 2 Z" fill="${c}"/>`,
-    ring: c => `<circle cx="50" cy="50" r="38" fill="none" stroke="${c}" stroke-width="14"/>`,
-    dotSmall: c => `<circle cx="50" cy="50" r="18" fill="${c}"/>`,
-    dotLarge: c => `<circle cx="50" cy="50" r="46" fill="${c}"/>`,
-    crescentDot: c => `<circle cx="50" cy="50" r="30" fill="${c}"/>`,
-    flag: c => `<rect x="20" y="6" width="6" height="88" fill="${c}"/><path d="M26 10 H86 L74 26 L86 42 H26 Z" fill="${c}" opacity="0.85"/>`,
+    circle: (p, s) => `<circle cx="50" cy="50" r="40" fill="${p}" stroke="${s}" stroke-width="4"/>`,
+    square: (p, s) => `<rect x="12" y="12" width="76" height="76" rx="8" fill="${p}" stroke="${s}" stroke-width="4"/>`,
+    roundedSquare: (p, s) => `<rect x="10" y="10" width="80" height="80" rx="24" fill="${p}" stroke="${s}" stroke-width="4"/>`,
+    triangle: (p, s) => `<polygon points="50,10 90,86 10,86" fill="${p}" stroke="${s}" stroke-width="4" stroke-linejoin="round"/>`,
+    star: (p, s) => `<polygon points="50,7 60,37 94,37 67,57 77,90 50,70 23,90 33,57 6,37 40,37" fill="${p}" stroke="${s}" stroke-width="4" stroke-linejoin="round"/>`,
+    heart: (p, s) => `<path d="M50 86 C 17 64, 7 40, 23 23 C 35 11, 50 21, 50 33 C 50 21, 65 11, 77 23 C 93 40, 83 64, 50 86 Z" fill="${p}" stroke="${s}" stroke-width="4" stroke-linejoin="round"/>`,
+    diamond: (p, s) => `<polygon points="50,8 88,50 50,92 12,50" fill="${p}" stroke="${s}" stroke-width="4" stroke-linejoin="round"/>`,
+    hexagon: (p, s) => `<polygon points="50,8 88,28 88,72 50,92 12,72 12,28" fill="${p}" stroke="${s}" stroke-width="4" stroke-linejoin="round"/>`,
+    pentagon: (p, s) => `<polygon points="50,8 90,37 74,88 26,88 10,37" fill="${p}" stroke="${s}" stroke-width="4" stroke-linejoin="round"/>`,
+    drop: (p, s) => `<path d="M50 8 C 64 32, 86 55, 86 71 A 36 36 0 1 1 14 71 C 14 55, 36 32, 50 8 Z" fill="${p}" stroke="${s}" stroke-width="4" stroke-linejoin="round"/>`,
+    moon: (p, s) => `<path d="M60 8 A 44 44 0 1 0 60 92 A 36 36 0 1 1 60 8 Z" fill="${p}" stroke="${s}" stroke-width="4" stroke-linejoin="round"/>`,
+    cloud: (p, s) => `<path d="M26 68 A 17 17 0 0 1 26 35 A 21 21 0 0 1 67 27 A 17 17 0 0 1 71 68 Z" fill="${p}" stroke="${s}" stroke-width="4" stroke-linejoin="round"/>`,
+    sparkle: (p, s) => `<path d="M50 4 C 52 34, 64 46, 96 50 C 64 54, 52 66, 50 96 C 48 66, 36 54, 4 50 C 36 46, 48 34, 50 4 Z" fill="${p}" stroke="${s}" stroke-width="4" stroke-linejoin="round"/>`,
+    ring: (p, s) => `<circle cx="50" cy="50" r="36" fill="none" stroke="${p}" stroke-width="13"/>`,
+    dotSmall: (p, s) => `<circle cx="50" cy="50" r="17" fill="${p}" stroke="${s}" stroke-width="4"/>`,
+    dotLarge: (p, s) => `<circle cx="50" cy="50" r="44" fill="${p}" stroke="${s}" stroke-width="4"/>`,
+    crescentDot: (p, s) => `<circle cx="50" cy="50" r="29" fill="${p}" stroke="${s}" stroke-width="4"/>`,
+    flag: (p, s) => `<rect x="22" y="8" width="6" height="84" fill="${p}" stroke="${s}" stroke-width="3"/><path d="M28 12 H84 L72 27 L84 42 H28 Z" fill="${p}" opacity="0.85" stroke="${s}" stroke-width="3" stroke-linejoin="round"/>`,
   };
 
-  function shapeSvg(shapeId, color) {
-    const inner = SHAPES[shapeId] ? SHAPES[shapeId](color) : "";
+  function shapeSvg(shapeId, primary, secondary) {
+    const inner = SHAPES[shapeId] ? SHAPES[shapeId](primary, secondary) : "";
     return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
   }
 
   const HEX_RE = /^[0-9a-fA-F]{6}$/;
+  const PALETTE = ["22C55E","FFFFFF","000000","F87171","FB923C","F59E0B","FACC15","A3E635","10B981","14B8A6","38BDF8","3B82F6","6366F1","A855F7","D8B4FE","F472B6","FB7185","EF4444","B45309","9CA3AF"];
+  const CYCLE_MS = 5000;
 
-  const state = { hex: "FFCC01", packs: [], query: "" };
+  const state = {
+    packs: [],
+    query: "",
+    activePack: null,
+    primary: "FFCC01",
+    secondary: "000000",
+    activeField: "primary",
+    cycles: {},
+  };
 
-  const swatchStrip = document.getElementById("swatchStrip");
-  const colorPicker = document.getElementById("colorPicker");
-  const hexInput = document.getElementById("hexInput");
-  const hexError = document.getElementById("hexError");
-  const packList = document.getElementById("packList");
-  const toast = document.getElementById("toast");
-  const searchInput = document.getElementById("searchInput");
-  const settingsBtn = document.getElementById("settingsBtn");
-  const colorPanel = document.getElementById("colorPanel");
+  const els = {
+    packList: document.getElementById("packList"),
+    searchInput: document.getElementById("searchInput"),
+    toast: document.getElementById("toast"),
+    screenStore: document.getElementById("screenStore"),
+    screenCustomize: document.getElementById("screenCustomize"),
+    backBtn: document.getElementById("backBtn"),
+    czPreviewGrid: document.getElementById("czPreviewGrid"),
+    czPreviewName: document.getElementById("czPreviewName"),
+    czPreviewDesc: document.getElementById("czPreviewDesc"),
+    packNameInput: document.getElementById("packNameInput"),
+    packNameCount: document.getElementById("packNameCount"),
+    activeHexLabel: document.getElementById("activeHexLabel"),
+    primaryField: document.getElementById("primaryField"),
+    secondaryField: document.getElementById("secondaryField"),
+    primarySwatch: document.getElementById("primarySwatch"),
+    secondarySwatch: document.getElementById("secondarySwatch"),
+    primaryHexText: document.getElementById("primaryHexText"),
+    secondaryHexText: document.getElementById("secondaryHexText"),
+    swatchPalette: document.getElementById("swatchPalette"),
+    hexError: document.getElementById("hexError"),
+    includesLabel: document.getElementById("includesLabel"),
+    includesGrid: document.getElementById("includesGrid"),
+    czGenerateBtn: document.getElementById("czGenerateBtn"),
+  };
 
-  settingsBtn.addEventListener("click", () => colorPanel.classList.toggle("open"));
-
-  const SIGNATURE_SHAPES = ["circle", "heart", "star", "hexagon", "sparkle", "drop"];
-
-  function renderSwatchStrip() {
-    const color = "#" + state.hex;
-    swatchStrip.innerHTML = SIGNATURE_SHAPES.map(s => shapeSvg(s, color)).join("");
+  function showToast(message, ms = 3200) {
+    els.toast.textContent = message;
+    els.toast.classList.add("show");
+    setTimeout(() => els.toast.classList.remove("show"), ms);
   }
 
   function filteredPacks() {
@@ -496,73 +643,166 @@
     return state.packs.filter(p => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
   }
 
+  function chunk(arr, size) {
+    const out = [];
+    for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+    return out.length ? out : [[]];
+  }
+
+  function renderCardPreview(cardEl, pack, chunkIndex) {
+    const grid = cardEl.querySelector(".preview-grid");
+    const chunks = chunk(pack.shapes, 8);
+    const idx = chunkIndex % chunks.length;
+    const cells = chunks[idx];
+    grid.innerHTML = cells.map(s => `<div class="cell">${shapeSvg(s, "#" + state.primary, "#" + state.secondary)}</div>`).join("");
+  }
+
+  function startCycling(cardEl, pack) {
+    if (pack.shapes.length <= 8) return;
+    let idx = 0;
+    const interval = setInterval(() => {
+      const grid = cardEl.querySelector(".preview-grid");
+      grid.classList.add("fading");
+      setTimeout(() => {
+        idx += 1;
+        renderCardPreview(cardEl, pack, idx);
+        grid.classList.remove("fading");
+      }, 350);
+    }, CYCLE_MS);
+    state.cycles[pack.id] = interval;
+  }
+
+  function clearCycles() {
+    Object.values(state.cycles).forEach(clearInterval);
+    state.cycles = {};
+  }
+
   function renderPacks() {
-    const color = "#" + state.hex;
+    clearCycles();
     const packs = filteredPacks();
 
     if (packs.length === 0) {
-      packList.innerHTML = `<div class="empty-state">No packs match "${state.query}".</div>`;
+      els.packList.innerHTML = `<div class="empty-state">No packs match "${state.query}".</div>`;
       return;
     }
 
-    packList.innerHTML = packs.map((pack, i) => `
+    els.packList.innerHTML = packs.map((pack, i) => `
       <div class="pack-card" data-pack-id="${pack.id}">
         <div class="pack-preview">
           ${i === 0 ? '<div class="pack-badge">New</div>' : ''}
-          ${pack.shapes.slice(0, 4).map(s => `<div class="cell">${shapeSvg(s, color)}</div>`).join("")}
+          <div class="preview-grid"></div>
         </div>
         <p class="pack-name">${pack.name}</p>
         <div class="pack-meta">
           <span>${pack.shapeCount} emoji</span>
           <span class="price">Free</span>
         </div>
-        <button class="generate-btn" data-pack-id="${pack.id}">Generate</button>
+        <button class="customize-open-btn" data-pack-id="${pack.id}">Customize</button>
       </div>
     `).join("");
 
-    packList.querySelectorAll(".generate-btn").forEach(btn => {
-      btn.addEventListener("click", () => handleGenerate(btn.dataset.packId, btn));
+    els.packList.querySelectorAll(".pack-card").forEach(cardEl => {
+      const pack = packs.find(p => p.id === cardEl.dataset.packId);
+      renderCardPreview(cardEl, pack, 0);
+      startCycling(cardEl, pack);
+      cardEl.addEventListener("click", () => openCustomize(pack));
     });
   }
 
-  function updateColor(newHex, { fromPicker } = {}) {
-    if (!HEX_RE.test(newHex)) {
-      hexError.style.display = "block";
-      return;
-    }
-    hexError.style.display = "none";
-    state.hex = newHex.toUpperCase();
-    hexInput.value = state.hex;
-    if (!fromPicker) colorPicker.value = "#" + state.hex;
-    renderSwatchStrip();
-    renderPacks();
-  }
-
-  colorPicker.addEventListener("input", (e) => {
-    updateColor(e.target.value.replace("#", ""), { fromPicker: true });
-  });
-
-  hexInput.addEventListener("input", (e) => {
-    updateColor(e.target.value.replace("#", ""));
-  });
-
-  searchInput.addEventListener("input", (e) => {
+  els.searchInput.addEventListener("input", (e) => {
     state.query = e.target.value.trim();
     renderPacks();
   });
 
-  function showToast(message, ms = 3200) {
-    toast.textContent = message;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), ms);
+  // ---------------- Customize screen ----------------
+
+  function openCustomize(pack) {
+    state.activePack = pack;
+    state.primary = "FFCC01";
+    state.secondary = "000000";
+    state.activeField = "primary";
+
+    els.packNameInput.value = pack.name;
+    els.packNameCount.textContent = `${pack.name.length}/50`;
+    els.czPreviewDesc.textContent = pack.description;
+
+    renderPalette();
+    renderCustomizePreview();
+    renderColorFields();
+    renderIncludesGrid();
+
+    els.screenStore.classList.remove("active");
+    els.screenCustomize.classList.add("active");
+    clearCycles();
   }
 
-  async function handleGenerate(packId, btn) {
-    if (!HEX_RE.test(state.hex)) {
-      showToast("Enter a valid hex code first.");
+  function closeCustomize() {
+    els.screenCustomize.classList.remove("active");
+    els.screenStore.classList.add("active");
+    renderPacks();
+  }
+
+  els.backBtn.addEventListener("click", closeCustomize);
+
+  function renderCustomizePreview() {
+    const pack = state.activePack;
+    if (!pack) return;
+    const shown = pack.shapes.slice(0, 10);
+    els.czPreviewGrid.innerHTML = shown.map(s => `<div class="cell">${shapeSvg(s, "#" + state.primary, "#" + state.secondary)}</div>`).join("");
+    els.czPreviewName.textContent = els.packNameInput.value || pack.name;
+  }
+
+  function renderIncludesGrid() {
+    const pack = state.activePack;
+    if (!pack) return;
+    els.includesLabel.textContent = `Includes ${pack.shapes.length}`;
+    els.includesGrid.innerHTML = pack.shapes.map(s => `<div class="cell">${shapeSvg(s, "#" + state.primary, "#" + state.secondary)}</div>`).join("");
+  }
+
+  function renderColorFields() {
+    els.primarySwatch.style.background = "#" + state.primary;
+    els.secondarySwatch.style.background = "#" + state.secondary;
+    els.primaryHexText.textContent = "#" + state.primary;
+    els.secondaryHexText.textContent = "#" + state.secondary;
+    els.primaryField.classList.toggle("active", state.activeField === "primary");
+    els.secondaryField.classList.toggle("active", state.activeField === "secondary");
+    els.activeHexLabel.textContent = "#" + (state.activeField === "primary" ? state.primary : state.secondary);
+  }
+
+  function renderPalette() {
+    els.swatchPalette.innerHTML = PALETTE.map(hex => `<button type="button" style="background:#${hex}" data-hex="${hex}" aria-label="#${hex}"></button>`).join("");
+    els.swatchPalette.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", () => setActiveFieldColor(btn.dataset.hex));
+    });
+  }
+
+  function setActiveFieldColor(hex) {
+    if (!HEX_RE.test(hex)) return;
+    if (state.activeField === "primary") state.primary = hex.toUpperCase();
+    else state.secondary = hex.toUpperCase();
+    renderColorFields();
+    renderCustomizePreview();
+    renderIncludesGrid();
+  }
+
+  els.primaryField.addEventListener("click", () => { state.activeField = "primary"; renderColorFields(); });
+  els.secondaryField.addEventListener("click", () => { state.activeField = "secondary"; renderColorFields(); });
+
+  els.packNameInput.addEventListener("input", () => {
+    els.packNameCount.textContent = `${els.packNameInput.value.length}/50`;
+    els.czPreviewName.textContent = els.packNameInput.value || state.activePack.name;
+  });
+
+  async function handleGenerate() {
+    const pack = state.activePack;
+    if (!pack) return;
+    if (!HEX_RE.test(state.primary)) {
+      els.hexError.style.display = "block";
       return;
     }
+    els.hexError.style.display = "none";
 
+    const btn = els.czGenerateBtn;
     btn.disabled = true;
     const originalText = btn.textContent;
     btn.textContent = "Generating…";
@@ -573,16 +813,15 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           initData: tg?.initData || "",
-          packId,
-          hex: state.hex,
+          packId: pack.id,
+          hex: state.primary,
+          secondaryHex: state.secondary,
+          packName: els.packNameInput.value,
         }),
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "generation_failed");
-      }
+      if (!res.ok) throw new Error(data.error || "generation_failed");
 
       btn.textContent = "Sent ✓";
       btn.classList.add("success");
@@ -600,6 +839,8 @@
     }
   }
 
+  els.czGenerateBtn.addEventListener("click", handleGenerate);
+
   async function loadPacks() {
     try {
       const res = await fetch("/api/packs");
@@ -607,11 +848,10 @@
       state.packs = data.packs;
       renderPacks();
     } catch (err) {
-      packList.innerHTML = `<div class="empty-state">Couldn't load packs. Pull to refresh.</div>`;
+      els.packList.innerHTML = `<div class="empty-state">Couldn't load packs. Pull to refresh.</div>`;
     }
   }
 
-  renderSwatchStrip();
   loadPacks();
 </script>
 </body>

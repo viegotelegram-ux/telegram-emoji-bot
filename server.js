@@ -86,16 +86,21 @@ app.get("/api/packs", (req, res) => {
 
 app.post("/api/generate", async (req, res) => {
   try {
-    const { initData, packId, hex } = req.body || {};
+    const { initData, packId, hex, secondaryHex, packName } = req.body || {};
 
     const verified = verifyInitData(initData, BOT_TOKEN);
     if (!verified.ok) {
       return res.status(401).json({ error: "unauthorized", reason: verified.reason });
     }
 
-    const color = normalizeHex(hex);
-    if (!color) {
+    const primary = normalizeHex(hex);
+    if (!primary) {
       return res.status(400).json({ error: "invalid_hex" });
+    }
+    // secondaryHex is optional — generatePackImages falls back to black.
+    const secondary = secondaryHex ? normalizeHex(secondaryHex) : null;
+    if (secondaryHex && !secondary) {
+      return res.status(400).json({ error: "invalid_secondary_hex" });
     }
 
     const userId = verified.user?.id;
@@ -103,7 +108,8 @@ app.post("/api/generate", async (req, res) => {
       return res.status(400).json({ error: "missing_user" });
     }
 
-    const { pack, images } = await generatePackImages(packId, color);
+    const { pack, images } = await generatePackImages(packId, primary, secondary);
+    const displayName = (packName && String(packName).trim()) || pack.name;
 
     // Telegram allows up to 10 items per sendMediaGroup call, so chunk it.
     const chunkSize = 10;
@@ -112,14 +118,14 @@ app.post("/api/generate", async (req, res) => {
       const media = chunk.map((img, idx) => ({
         type: "document",
         media: { source: img.buffer, filename: img.filename },
-        caption: i === 0 && idx === 0 ? `${pack.name} — recolored to ${color}` : undefined,
+        caption: i === 0 && idx === 0 ? `${displayName} — recolored to ${primary}` : undefined,
       }));
       await bot.telegram.sendMediaGroup(userId, media);
     }
 
     await bot.telegram.sendMessage(
       userId,
-      `Your "${pack.name}" pack in ${color} is above ⬆️ — save the files to use them, or add them as custom emoji.`
+      `Your "${displayName}" pack in ${primary} is above ⬆️ — save the files to use them, or add them as custom emoji.`
     );
 
     res.json({ ok: true, delivered: images.length });
