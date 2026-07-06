@@ -622,8 +622,14 @@
       try {
         const url = `/api/lottie?packId=${encodeURIComponent(pack.id)}&shapeId=${encodeURIComponent(shapeId)}&primary=${encodeURIComponent(primaryHex.replace("#", ""))}&secondary=${encodeURIComponent(secondaryHex.replace("#", ""))}`;
         const res = await fetch(url);
-        if (!res.ok) throw new Error("lottie fetch failed");
+        if (!res.ok) {
+          const errBody = await res.text().catch(() => "");
+          throw new Error(`HTTP ${res.status}: ${errBody}`);
+        }
         const animationData = await res.json();
+        if (typeof window.lottie === "undefined") {
+          throw new Error("lottie-web failed to load (CDN script didn't load)");
+        }
         const anim = window.lottie.loadAnimation({
           container: cell,
           renderer: "svg",
@@ -633,8 +639,8 @@
         });
         lotties.push(anim);
       } catch (err) {
-        console.error("Failed to load animated emoji", shapeId, err);
-        cell.innerHTML = "";
+        console.error(`[emoji-store] Failed to load animated emoji "${shapeId}":`, err);
+        cell.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#FF6B6B;font-size:10px;text-align:center;border:1px solid #FF6B6B;border-radius:8px;">⚠</div>`;
       }
     }));
 

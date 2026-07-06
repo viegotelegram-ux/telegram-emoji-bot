@@ -205,16 +205,25 @@ app.post("/api/generate", async (req, res) => {
       }
     }
 
-    // Telegram allows up to 10 items per sendMediaGroup call, so chunk it.
-    const chunkSize = 10;
-    for (let i = 0; i < images.length; i += chunkSize) {
-      const chunk = images.slice(i, i + chunkSize);
-      const media = chunk.map((img, idx) => ({
-        type: "document",
-        media: { source: img.buffer, filename: img.filename },
-        caption: i === 0 && idx === 0 ? `${displayName} — recolored to ${primary}` : undefined,
-      }));
-      await bot.telegram.sendMediaGroup(userId, media);
+    // Telegram allows up to 10 items per sendMediaGroup call for documents,
+    // but .tgs files need sendSticker (one at a time) to actually play as
+    // an animated sticker in the chat — sendMediaGroup would just attach
+    // them as inert downloadable files.
+    if (pack.kind === "tgs") {
+      for (const img of images) {
+        await bot.telegram.sendSticker(userId, { source: img.buffer, filename: img.filename });
+      }
+    } else {
+      const chunkSize = 10;
+      for (let i = 0; i < images.length; i += chunkSize) {
+        const chunk = images.slice(i, i + chunkSize);
+        const media = chunk.map((img, idx) => ({
+          type: "document",
+          media: { source: img.buffer, filename: img.filename },
+          caption: i === 0 && idx === 0 ? `${displayName} — recolored to ${primary}` : undefined,
+        }));
+        await bot.telegram.sendMediaGroup(userId, media);
+      }
     }
 
     await bot.telegram.sendMessage(
